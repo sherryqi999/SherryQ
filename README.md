@@ -100,7 +100,7 @@ tmp = sapply(keggresids, plot_pathway ) # takes a bit to finish running, be pati
 # data(go.gs)
 # data(carta.gs)
 # 
-# species="hsapiens"
+# species="hsapiens" 
 # pathwaydb="kegg"
 # path<-GetData(species,pathwaydb)
 
