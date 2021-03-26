@@ -31,7 +31,7 @@ kegg.sets.hs =  kegg.sets.hs[sigmet.idx.hs]
 head(kegg.sets.hs,3)
 head(kegg.sets.hs)
 setwd("~/Desktop/RNAseq Pathway analysis 03232021 ")
-gene<-read.csv(file="differential_expression_PODXL1_vs_control.csv")
+gene<-read.csv(file="differential_expression_PKD1_vs_control.csv")
 head(gene)
 
 gene.df<-bitr(geneID=gene$gene.symbol, fromType = "SYMBOL", 
@@ -49,45 +49,57 @@ keggres
 # Look at both up (greater), down (less), and statatistics.
 lapply(keggres, head)
 
-keggrespathways = data.frame(id=rownames(keggres$greater), keggres$greater) %>% 
+#pick the top and bottom five pathways to draw. you can change the number depends on your interests. 
+keggrespathwaysGreater = data.frame(id=rownames(keggres$greater), keggres$greater) %>% 
   tibble::as_tibble() %>% 
-  filter(row_number()<=20) %>% 
+  filter(row_number()<=5) %>% 
   .$id %>% 
   as.character()
 
-keggrespathways = data.frame(id=rownames(keggres$less), keggres$less) %>% 
+keggrespathwaysLess = data.frame(id=rownames(keggres$less), keggres$less) %>% 
   tibble::as_tibble() %>% 
-  filter(row_number()<=20) %>% 
+  filter(row_number()<=5) %>% 
   .$id %>% 
   as.character()
 
-keggrespathways
+keggrespathwaysGreater
+keggrespathwaysLess
+
 # Get the IDs.
-keggresids = substr(keggrespathways, start=1, stop=8)
-summary(keggresids)
+keggresidsGreater = substr(keggrespathwaysGreater, start=1, stop=8)
+summary(keggresidsGreater)
 
-# 先定义画图函数
+keggresidsLess = substr(keggrespathwaysLess, start=1, stop=8)
+summary(keggresidsLess)
+
+keggresids=c(keggresidsGreater,keggresidsLess) #prepare to output all of the figures at the sametime
+
+# define the function
 plot_pathway = function(pid) 
   pathview(
     gene.data=foldchanges, pathway.id=keggresids, species="hsa", new.signature=FALSE)
 
-# 同时画多个pathways，这些plots自动存到工作目录
-tmp = sapply(keggresids, plot_pathway )
-# 04390 Hippo Pathway
-
-library(go.sets.hs)
-summary(go.sets.hs)
+# output mutiple pathways and output to the working directory automatically
+tmp = sapply(keggresids, plot_pathway ) # takes a bit to finish running, be patient;). 
+# note: the human pathway package is a bit outdated, so 
+#if it doesnt have the pathways you wanted, you can go to https://pathview.uncc.edu/analysis, somehow this website's library is a bit dated.
 
 
-if (!requireNamespace("BiocManager", quietly=TRUE))
-  install.packages("BiocManager")
-BiocManager::install("StarBioTrek")
-library("StarBioTrek")
-data(kegg.gs)
-data(kegg.gs.dise)
-data(go.gs)
-data(carta.gs)
 
-species="hsapiens"
-pathwaydb="kegg"
-path<-GetData(species,pathwaydb)
+#================================================= incase you interested in the other library and cannot install baocManager
+# library(go.sets.hs)
+# summary(go.sets.hs)
+# 
+# 
+# if (!requireNamespace("BiocManager", quietly=TRUE))
+#   install.packages("BiocManager")
+# BiocManager::install("StarBioTrek")
+# library("StarBioTrek")
+# data(kegg.gs)
+# data(kegg.gs.dise)
+# data(go.gs)
+# data(carta.gs)
+# 
+# species="hsapiens"
+# pathwaydb="kegg"
+# path<-GetData(species,pathwaydb)
